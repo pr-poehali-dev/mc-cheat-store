@@ -10,6 +10,7 @@ interface Cheat {
   name: string;
   description: string;
   price: number;
+  oldPrice?: number;
   server: string[];
   version: string;
   type: string;
@@ -20,66 +21,51 @@ interface Cheat {
 const cheats: Cheat[] = [
   {
     id: 1,
-    name: 'Ultimate PvP Pack',
-    description: 'Полный набор для доминирования в PvP боях',
-    price: 499,
+    name: 'Monoton (crack)',
+    description: 'Мощный чит-клиент с расширенными возможностями',
+    price: 0,
+    oldPrice: 250,
     server: ['FunTime', 'ReallyWorld', 'HolyWorld'],
-    version: '1.16.5',
+    version: '1.12.2',
     type: 'Combat',
     features: ['KillAura', 'Velocity', 'Criticals', 'AutoPot'],
     popular: true
   },
   {
     id: 2,
-    name: 'Mega Miner Pro',
-    description: 'Профессиональный набор для добычи ресурсов',
-    price: 299,
+    name: 'Dimasik (crack)',
+    description: 'Продвинутый клиент для профессионалов',
+    price: 0,
+    oldPrice: 350,
     server: ['FunTime', 'SpookyTime'],
-    version: '1.16.5',
-    type: 'Mining',
+    version: '1.12.2',
+    type: 'Universal',
     features: ['XRay', 'AutoMine', 'Nuker', 'ChestESP'],
     popular: true
   },
   {
     id: 3,
-    name: 'Speed Demon',
-    description: 'Максимальная скорость передвижения',
-    price: 199,
+    name: 'RelakeDLC',
+    description: 'Легкий и быстрый чит-клиент',
+    price: 0,
+    oldPrice: 100,
     server: ['ReallyWorld', 'HolyWorld', 'SpookyTime'],
-    version: '1.16.5',
+    version: '1.12.2',
     type: 'Movement',
-    features: ['Speed', 'Fly', 'Jesus', 'Spider']
-  },
-  {
-    id: 4,
-    name: 'Ghost Client',
-    description: 'Незаметный чит для обхода античита',
-    price: 799,
-    server: ['FunTime', 'ReallyWorld'],
-    version: '1.16.5',
-    type: 'Ghost',
-    features: ['AimAssist', 'Reach', 'AutoClicker', 'NoFall'],
+    features: ['Speed', 'Fly', 'Jesus', 'Spider'],
     popular: true
   },
   {
-    id: 5,
-    name: 'Builder Plus',
-    description: 'Инструменты для быстрого строительства',
-    price: 249,
-    server: ['SpookyTime', 'HolyWorld'],
-    version: '1.16.5',
-    type: 'Building',
-    features: ['Scaffold', 'FastPlace', 'AutoTool', 'Freecam']
-  },
-  {
-    id: 6,
-    name: 'Total Control',
-    description: 'Полный контроль над игрой',
-    price: 999,
+    id: 4,
+    name: 'Nursultan',
+    description: 'Премиум чит-клиент с уникальными функциями',
+    price: 0,
+    oldPrice: 863,
     server: ['FunTime', 'ReallyWorld', 'SpookyTime', 'HolyWorld'],
-    version: '1.16.5',
-    type: 'Universal',
-    features: ['All Features', 'Custom Modules', 'GUI', 'ClickGUI']
+    version: '1.12.2',
+    type: 'Ghost',
+    features: ['AimAssist', 'Reach', 'AutoClicker', 'NoFall'],
+    popular: true
   }
 ];
 
@@ -94,6 +80,27 @@ export default function Index() {
   const [selectedServer, setSelectedServer] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [activeTab, setActiveTab] = useState('home');
+  const [cart, setCart] = useState<Cheat[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
+
+  const addToCart = (cheat: Cheat) => {
+    if (!cart.find(item => item.id === cheat.id)) {
+      setCart([...cart, cheat]);
+    }
+  };
+
+  const removeFromCart = (cheatId: number) => {
+    setCart(cart.filter(item => item.id !== cheatId));
+  };
+
+  const handlePay = () => {
+    setIsPaid(true);
+  };
+
+  const handleGoToFiles = () => {
+    window.open('https://collapseloader.org/', '_blank');
+  };
 
   const filteredCheats = cheats.filter(cheat => {
     const serverMatch = selectedServer === 'all' || cheat.server.includes(selectedServer);
@@ -141,13 +148,118 @@ export default function Index() {
         </div>
       </header>
 
+      {cart.length > 0 && !isCartOpen && (
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="fixed bottom-8 right-8 z-50 w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full shadow-lg shadow-purple-500/50 flex items-center justify-center transition-transform hover:scale-110 animate-scale-in"
+        >
+          <Icon name="ShoppingCart" className="text-white" size={24} />
+          <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {cart.length}
+          </span>
+        </button>
+      )}
+
+      {isCartOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <Card className="bg-slate-900 border-purple-500/20 w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <CardHeader className="border-b border-purple-500/20">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Icon name="ShoppingCart" size={24} />
+                  Корзина ({cart.length})
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCartOpen(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Icon name="X" size={20} />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto p-6">
+              {!isPaid ? (
+                <div className="space-y-4">
+                  {cart.length === 0 ? (
+                    <p className="text-gray-400 text-center py-8">Корзина пуста</p>
+                  ) : (
+                    cart.map(cheat => (
+                      <div key={cheat.id} className="bg-slate-800/50 rounded-lg p-4 flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-white font-bold">{cheat.name}</h4>
+                          <p className="text-sm text-gray-400">{cheat.version}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            {cheat.oldPrice && (
+                              <span className="text-sm text-gray-500 line-through">{cheat.oldPrice}₽</span>
+                            )}
+                            <span className="text-lg font-bold text-green-400">{cheat.price}₽</span>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFromCart(cheat.id)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <Icon name="Trash2" size={20} />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8 space-y-6">
+                  <div className="flex justify-center">
+                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <Icon name="Check" className="text-green-400" size={40} />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Успешная оплата!</h3>
+                    <p className="text-gray-400">Ваш заказ успешно обработан</p>
+                  </div>
+                  <Button
+                    size="lg"
+                    onClick={handleGoToFiles}
+                    className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
+                  >
+                    <Icon name="Download" className="mr-2" size={20} />
+                    Перейти к файлам
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+            {!isPaid && cart.length > 0 && (
+              <CardFooter className="border-t border-purple-500/20 flex items-center justify-between p-6">
+                <div>
+                  <p className="text-sm text-gray-400">Итого:</p>
+                  <p className="text-2xl font-bold text-green-400">
+                    {cart.reduce((sum, cheat) => sum + cheat.price, 0)}₽
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  onClick={handlePay}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                >
+                  <Icon name="CreditCard" className="mr-2" size={20} />
+                  Оплатить
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        </div>
+      )}
+
       <main className="container mx-auto px-4 py-8">
         {activeTab === 'home' && (
           <div className="space-y-12 animate-fade-in">
             <section className="text-center py-20 space-y-6">
               <div className="inline-block">
                 <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/50 mb-4">
-                  Версия 1.16.5
+                  Версия 1.12.2
                 </Badge>
               </div>
               <h2 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-fade-in">
@@ -227,8 +339,16 @@ export default function Index() {
                       </div>
                     </CardContent>
                     <CardFooter className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-white">{cheat.price}₽</span>
-                      <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                      <div className="flex items-center gap-2">
+                        {cheat.oldPrice && (
+                          <span className="text-lg text-gray-500 line-through">{cheat.oldPrice}₽</span>
+                        )}
+                        <span className="text-2xl font-bold text-green-400">{cheat.price}₽</span>
+                      </div>
+                      <Button 
+                        onClick={() => addToCart(cheat)}
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                      >
                         Купить
                       </Button>
                     </CardFooter>
@@ -330,8 +450,16 @@ export default function Index() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-white">{cheat.price}₽</span>
-                    <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                    <div className="flex items-center gap-2">
+                      {cheat.oldPrice && (
+                        <span className="text-lg text-gray-500 line-through">{cheat.oldPrice}₽</span>
+                      )}
+                      <span className="text-2xl font-bold text-green-400">{cheat.price}₽</span>
+                    </div>
+                    <Button 
+                      onClick={() => addToCart(cheat)}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    >
                       <Icon name="ShoppingCart" size={16} className="mr-2" />
                       Купить
                     </Button>
@@ -374,7 +502,7 @@ export default function Index() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <h4 className="text-white font-bold mb-4">MCCheats Pro</h4>
-              <p className="text-gray-400 text-sm">Лучшие читы для Minecraft 1.16.5</p>
+              <p className="text-gray-400 text-sm">Лучшие читы для Minecraft 1.12.2</p>
             </div>
             <div>
               <h4 className="text-white font-bold mb-4">Серверы</h4>
